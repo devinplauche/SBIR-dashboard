@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SBIR Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --paper:#F4F6F4; --surface:#FFFFFF; --sunken:#EAEEEB; --raised:#FDFEFD;
+  --ink:#131A22; --body:#2E3A3C; --muted:#66726F;
+  --rule:#CBD3CE; --rule-strong:#9FAAA5;
+  --accent:#1F5E4A; --accent-soft:#DCE8E1;
+  --signal:#B4552B; --signal-soft:#F5E4DA;
+  --warn:#8A6D1F; --warn-soft:#F2EAD3;
+  --shadow:0 1px 2px rgba(19,26,34,.05),0 6px 18px -14px rgba(19,26,34,.3);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#10161A; --surface:#171F24; --sunken:#1D262B; --raised:#1B242A;
+  --ink:#EEF2EF; --body:#C3CDC9; --muted:#8B9793;
+  --rule:#2C383D; --rule-strong:#465559;
+  --accent:#6FBF9D; --accent-soft:#1B3830;
+  --signal:#E08A5C; --signal-soft:#3A2418;
+  --warn:#D6B65E; --warn-soft:#332C14;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px -14px rgba(0,0,0,.75);
+}}
+:root[data-theme="dark"]{
+  --paper:#10161A; --surface:#171F24; --sunken:#1D262B; --raised:#1B242A;
+  --ink:#EEF2EF; --body:#C3CDC9; --muted:#8B9793;
+  --rule:#2C383D; --rule-strong:#465559;
+  --accent:#6FBF9D; --accent-soft:#1B3830;
+  --signal:#E08A5C; --signal-soft:#3A2418;
+  --warn:#D6B65E; --warn-soft:#332C14;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px -14px rgba(0,0,0,.75);
+}
+
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{
+  margin:0;background:var(--paper);color:var(--body);
+  font-family:"Source Serif 4",Georgia,serif;font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 88px}
+h1,h2,h3{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;color:var(--ink);margin:0;text-wrap:balance}
+h1{font-size:clamp(1.7rem,3.4vw,2.35rem);font-weight:700;letter-spacing:-.02em;line-height:1.05}
+h2{font-size:1.12rem;font-weight:650;letter-spacing:-.008em}
+h3{font-size:.97rem;font-weight:600;line-height:1.3}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.67rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+/* header */
+header{padding:38px 0 0}
+.rule-top{height:3px;background:var(--ink);margin-bottom:18px}
+.head-row{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between}
+.head-row p.lede{max-width:520px;margin-top:9px;font-size:1.02rem}
+.stamp{display:flex;flex-direction:column;gap:4px;text-align:right;flex-shrink:0}
+.stamp .big{font-family:Archivo,sans-serif;font-weight:700;font-size:1.05rem;color:var(--ink)}
+
+/* source health */
+.health{
+  display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;
+  margin-top:22px;padding:11px 16px;background:var(--surface);border:1px solid var(--rule);
+  font-size:.8rem;
+}
+.health.bad{border-color:var(--signal);background:var(--signal-soft)}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle}
+.dot.ok{background:var(--accent)} .dot.bad{background:var(--signal)}
+
+/* summary tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:14px}
+.tiles>div{background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.tiles .k{font-family:"IBM Plex Mono",monospace;font-size:.63rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.tiles .v{font-family:Archivo,sans-serif;font-size:1.55rem;font-weight:700;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.tiles .v.hot{color:var(--signal)} .tiles .v.go{color:var(--accent)}
+.tiles .n{font-size:.78rem;color:var(--muted);line-height:1.35}
+
+/* urgent lane */
+.urgent{margin-top:34px;border:1px solid var(--signal);background:var(--signal-soft)}
+.urgent-hd{padding:14px 18px 12px;border-bottom:1px solid var(--signal);display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
+.urgent-hd h2{color:var(--signal)}
+.urgent-list{display:flex;flex-direction:column}
+.urgent-item{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding:11px 18px;border-bottom:1px solid color-mix(in srgb,var(--signal) 30%,transparent);font-size:.87rem}
+.urgent-item:last-child{border-bottom:none}
+.urgent-item .cd{font-family:Archivo,sans-serif;font-weight:700;color:var(--signal);font-size:.9rem;min-width:62px}
+.urgent-item .tt{color:var(--ink);font-weight:600;flex:1;min-width:200px}
+
+/* controls */
+.controls{
+  position:sticky;top:0;z-index:20;margin-top:36px;padding:14px 0;
+  background:color-mix(in srgb,var(--paper) 92%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);
+}
+.controls-inner{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+input[type=search],select{
+  font-family:"IBM Plex Mono",monospace;font-size:.8rem;color:var(--ink);
+  background:var(--surface);border:1px solid var(--rule-strong);padding:8px 11px;
+}
+input[type=search]{min-width:210px;flex:1 1 210px}
+label.ctl{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--muted);white-space:nowrap}
+label.ctl .eyebrow{font-size:.63rem}
+.toggle{display:flex;border:1px solid var(--rule-strong)}
+.toggle button{
+  font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;
+  background:var(--surface);color:var(--muted);border:none;padding:8px 12px;cursor:pointer;
+}
+.toggle button[aria-pressed=true]{background:var(--accent);color:var(--paper)}
+.toggle button+button{border-left:1px solid var(--rule-strong)}
+.count{font-size:.8rem;color:var(--muted);margin-left:auto;white-space:nowrap}
+
+/* lanes */
+.lane{margin-top:40px}
+.lane-hd{border-top:1px solid var(--rule-strong);padding-top:13px;margin-bottom:6px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+.lane-hd p{font-size:.85rem;color:var(--muted);max-width:560px}
+
+/* rows */
+.rows{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.row{background:var(--surface);border:1px solid var(--rule);box-shadow:var(--shadow)}
+.row summary{
+  list-style:none;cursor:pointer;padding:13px 16px;
+  display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;
+}
+.row summary::-webkit-details-marker{display:none}
+.row summary:hover{background:var(--raised)}
+.fit{display:flex;flex-direction:column;gap:4px;align-items:center}
+.fit .n{font-family:Archivo,sans-serif;font-weight:700;font-size:1rem;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.fit .bar{width:34px;height:3px;background:var(--rule);overflow:hidden}
+.fit .bar i{display:block;height:100%;background:var(--accent)}
+.rtitle{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rtitle .t{font-family:Archivo,sans-serif;font-weight:600;color:var(--ink);font-size:.94rem;line-height:1.25}
+.rmeta{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--muted)}
+.rright{display:flex;flex-direction:column;gap:5px;align-items:flex-end;text-align:right}
+.days{font-family:Archivo,sans-serif;font-weight:700;font-size:.95rem;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+.days small{display:block;font-family:"IBM Plex Mono",monospace;font-weight:400;font-size:.63rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+
+.pill{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.61rem;font-weight:500;
+  letter-spacing:.09em;text-transform:uppercase;padding:2px 7px;white-space:nowrap;
+  border:1px solid var(--rule-strong);color:var(--muted);
+}
+.pill.go{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.pill.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.pill.hot{background:var(--signal-soft);border-color:transparent;color:var(--signal)}
+.pill.dead{opacity:.6;text-decoration:line-through}
+
+.detail{border-top:1px solid var(--rule);padding:16px;display:flex;flex-direction:column;gap:13px;background:var(--sunken)}
+.detail p.obj{font-size:.9rem}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.kv>div{background:var(--surface);padding:9px 12px;display:flex;flex-direction:column;gap:2px}
+.kv .k{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.kv .v{font-family:Archivo,sans-serif;font-size:.8rem;font-weight:600;color:var(--ink);line-height:1.25;word-break:break-word}
+.hits{display:flex;flex-wrap:wrap;gap:5px}
+.detail a.out{font-family:"IBM Plex Mono",monospace;font-size:.76rem}
+
+.empty{padding:44px 20px;text-align:center;color:var(--muted);font-size:.9rem;border:1px dashed var(--rule-strong)}
+
+footer{margin-top:64px;border-top:1px solid var(--rule-strong);padding-top:18px;font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:9px;max-width:700px}
+
+@media (max-width:640px){
+  .wrap{padding:0 15px 64px}
+  .row summary{grid-template-columns:38px 1fr;gap:11px}
+  .rright{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;text-align:left}
+  .stamp{text-align:left}
+  .count{margin-left:0;width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="rule-top"></div>
+  <div class="head-row">
+    <div>
+      <span class="eyebrow">Open SBIR / STTR topics · scored for small software teams</span>
+      <h1>SBIR Watch</h1>
+      <p class="lede">Every open topic, ranked by whether two or three people with strong software skills could actually deliver the Phase&nbsp;I — and whether the deadline is still reachable from a standing start.</p>
+    </div>
+    <div class="stamp">
+      <span class="eyebrow">Data refreshed</span>
+      <span class="big mono" id="stamp">—</span>
+      <span class="eyebrow" id="stamp-age"></span>
+    </div>
+  </div>
+
+  <div class="health" id="health"><span class="mono">Loading sources…</span></div>
+  <div class="tiles" id="tiles"></div>
+</header>
+
+<section class="urgent" id="urgent" hidden>
+  <div class="urgent-hd">
+    <h2>Closing inside three weeks</h2>
+    <span class="eyebrow">Contact windows shut before deadlines do</span>
+  </div>
+  <div class="urgent-list" id="urgent-list"></div>
+</section>
+
+<div class="controls">
+  <div class="controls-inner">
+    <input type="search" id="q" placeholder="Search title, code, agency…" aria-label="Search topics">
+    <label class="ctl"><span class="eyebrow">Agency</span>
+      <select id="agency"><option value="">All</option></select>
+    </label>
+    <label class="ctl"><span class="eyebrow">Min fit</span>
+      <select id="minfit">
+        <option value="20">20+</option>
+        <option value="35" selected>35+</option>
+        <option value="50">50+</option>
+        <option value="0">Any</option>
+      </select>
+    </label>
+    <label class="ctl"><span class="eyebrow">Sort</span>
+      <select id="sort">
+        <option value="fit">Best fit</option>
+        <option value="close">Soonest deadline</option>
+        <option value="tpoc">Contact window</option>
+      </select>
+    </label>
+    <label class="ctl"><span class="eyebrow">SAM.gov</span>
+      <span class="toggle">
+        <button id="reg-no" aria-pressed="true">Not registered</button>
+        <button id="reg-yes" aria-pressed="false">Registered</button>
+      </span>
+    </label>
+    <label class="ctl">
+      <input type="checkbox" id="hideblocked" checked> Hide unbuildable
+    </label>
+    <span class="count" id="count"></span>
+  </div>
+</div>
+
+<section class="lane">
+  <div class="lane-hd">
+    <h2>Solicitations</h2>
+    <p>Specific asks with a named deliverable and a fixed close date. You respond to these.</p>
+  </div>
+  <div class="rows" id="lane-sol"></div>
+</section>
+
+<section class="lane">
+  <div class="lane-hd">
+    <h2>NSF categories</h2>
+    <p>NSF publishes a taxonomy, not a list of asks — you propose your own project into a category. Rolling; gated by an invited Project Pitch that takes one to two months to clear.</p>
+  </div>
+  <div class="rows" id="lane-cat"></div>
+</section>
+
+<footer>
+  <p>Fit scores are a keyword heuristic over topic text, tuned to surface software-only work a small team can build without a lab, a fab, a clearance, or a university partner. They rank a shortlist for a human to read — they do not judge merit, and a low score is not a verdict.</p>
+  <p>Deadlines and award ceilings vary by component. SBIR.gov and DSIP mirror agency documents and are not authoritative — confirm against the agency's own solicitation before relying on anything here.</p>
+  <p id="report-link"></p>
+</footer>
+
+</div>
+
+<script>
+const DAY = 86400000;
+const today = new Date(); today.setHours(0,0,0,0);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let TOPICS = [], META = {}, REG_DAYS = 28;
+
+const daysTo = iso => iso ? Math.round((new Date(iso+'T00:00:00') - today) / DAY) : null;
+
+// Writing time a proposal realistically needs once you can legally submit.
+const WRITE_DAYS = 14;
+
+function reachability(t){
+  const d = daysTo(t.close);
+  if (d === null) return {key:'unknown', label:'No date', cls:''};
+  if (d < 0) return {key:'closed', label:'Closed', cls:'dead'};
+  const slack = d - REG_DAYS;
+  if (slack < 0) return {key:'blocked', label:'Registration too slow', cls:'hot'};
+  if (slack < WRITE_DAYS) return {key:'tight', label:'Tight', cls:'warn'};
+  return {key:'open', label:'Reachable', cls:'go'};
+}
+
+function fmtDays(d){
+  if (d === null) return '—';
+  if (d < 0) return 'closed';
+  if (d === 0) return 'today';
+  return d + 'd';
+}
+
+function tpocOpen(t){
+  const d = daysTo(t.tpoc_until);
+  return (d !== null && d >= 0) ? d : null;
+}
+
+async function load(){
+  try {
+    const [tRes, mRes] = await Promise.all([
+      fetch('data/topics.json', {cache:'no-store'}),
+      fetch('data/meta.json',   {cache:'no-store'}),
+    ]);
+    if (!tRes.ok || !mRes.ok) throw new Error('HTTP ' + tRes.status + '/' + mRes.status);
+    TOPICS = await tRes.json();
+    META = await mRes.json();
+  } catch (e) {
+    $('#health').className = 'health bad';
+    $('#health').innerHTML = '<span class="mono">Could not load data: ' + esc(e.message) +
+      '. If you opened this file directly, serve it instead — <code>python -m http.server</code> in the <code>docs/</code> folder.</span>';
+    return;
+  }
+  REG_DAYS = META.registration_days ?? 28;
+  renderHeader();
+  buildAgencyFilter();
+  renderUrgent();
+  render();
+}
+
+function renderHeader(){
+  const gen = new Date(META.generated);
+  $('#stamp').textContent = gen.toISOString().slice(0,16).replace('T',' ') + 'Z';
+  const ageH = Math.floor((Date.now() - gen) / 3600000);
+  $('#stamp-age').textContent = ageH < 1 ? 'just now' : (ageH < 48 ? ageH + 'h ago' : Math.floor(ageH/24) + 'd ago');
+
+  const srcs = Object.entries(META.sources || {}).filter(([k]) => !k.startsWith('_'));
+  const bad = srcs.filter(([,v]) => !v.ok);
+  const h = $('#health');
+  h.className = 'health' + (bad.length ? ' bad' : '');
+  h.innerHTML = srcs.map(([k,v]) =>
+    `<span class="mono"><span class="dot ${v.ok?'ok':'bad'}"></span>${esc(k)} · ${v.count} topics${v.ok?'':' · STALE, carried forward'}</span>`
+  ).join('') + (bad.length
+    ? `<span class="mono" style="flex:1;min-width:200px">${esc(bad.map(([k,v])=>k+': '+v.error).join(' | '))}</span>`
+    : '');
+
+  const sols = TOPICS.filter(t => t.kind === 'solicitation');
+  const buildable = sols.filter(t => !t.blocked && t.fit >= 35);
+  const reachable = buildable.filter(t => ['open','tight'].includes(reachability(t).key));
+  const calls = sols.filter(t => tpocOpen(t) !== null && tpocOpen(t) <= 21);
+
+  $('#tiles').innerHTML = `
+    <div><span class="k">Open topics</span><span class="v">${META.total}</span>
+      <span class="n">${Object.entries(META.agencies).map(([a,c])=>a+' '+c).join(' · ')}</span></div>
+    <div><span class="k">Worth a look</span><span class="v go">${buildable.length}</span>
+      <span class="n">Software-buildable solicitations scoring 35 or better</span></div>
+    <div><span class="k">Still reachable</span><span class="v ${reachable.length?'go':'hot'}">${reachable.length}</span>
+      <span class="n">Deadline clears ${REG_DAYS}-day registration plus writing time</span></div>
+    <div><span class="k">Author reachable</span><span class="v ${calls.length?'hot':''}">${calls.length}</span>
+      <span class="n">DoD contact windows shutting within 21 days</span></div>`;
+
+  $('#report-link').innerHTML = '<a href="report.html">Read the full written analysis →</a> · ' +
+    '<a href="https://github.com/devinplauche/SBIR-dashboard">Source and refresh schedule</a>';
+}
+
+function buildAgencyFilter(){
+  const sel = $('#agency');
+  const keys = new Set();
+  TOPICS.forEach(t => keys.add(t.component || t.agency));
+  [...keys].sort().forEach(k => {
+    const o = document.createElement('option'); o.value = k; o.textContent = k; sel.appendChild(o);
+  });
+}
+
+function renderUrgent(){
+  const items = [];
+  TOPICS.filter(t => t.kind === 'solicitation').forEach(t => {
+    const tp = tpocOpen(t);
+    if (tp !== null && tp <= 21 && t.fit >= 30 && !t.blocked)
+      items.push({d:tp, label:'author contact closes', t});
+    const dc = daysTo(t.close);
+    if (dc !== null && dc >= 0 && dc <= 21 && t.fit >= 30 && !t.blocked)
+      items.push({d:dc, label:'proposals close', t});
+  });
+  if (!items.length) return;
+  items.sort((a,b) => a.d - b.d);
+  $('#urgent').hidden = false;
+  $('#urgent-list').innerHTML = items.slice(0,8).map(i => `
+    <div class="urgent-item">
+      <span class="cd">${fmtDays(i.d)}</span>
+      <span class="tt">${esc(i.t.title)}</span>
+      <span class="mono">${esc(i.t.code || '')} · ${esc(i.label)}</span>
+      ${i.t.tpocs && i.t.tpocs.length ? `<a class="mono" href="mailto:${esc(i.t.tpocs[0])}">${esc(i.t.tpocs[0])}</a>` : ''}
+    </div>`).join('');
+}
+
+function rowHtml(t){
+  const r = reachability(t);
+  const dc = daysTo(t.close);
+  const tp = tpocOpen(t);
+  const pills = [];
+  if (t.kind === 'solicitation') pills.push(`<span class="pill ${r.cls}">${esc(r.label)}</span>`);
+  if (tp !== null) pills.push(`<span class="pill ${tp<=14?'hot':'warn'}">Author reachable ${tp}d</span>`);
+  if (t.program) pills.push(`<span class="pill">${esc(t.program)}</span>`);
+  if (t.phases && t.phases.length && !t.has_phase1) pills.push('<span class="pill hot">No Phase I</span>');
+  (t.flags||[]).forEach(f => pills.push(`<span class="pill hot">${esc(f.replace(/_/g,' '))}</span>`));
+
+  return `<details class="row">
+    <summary>
+      <span class="fit"><span class="n">${t.fit}</span><span class="bar"><i style="width:${t.fit}%"></i></span></span>
+      <span class="rtitle">
+        <span class="t">${esc(t.title)}</span>
+        <span class="rmeta">
+          <span>${esc(t.component || t.agency)}</span>
+          ${t.code ? `<span>${esc(t.code)}</span>` : ''}
+          ${pills.join('')}
+        </span>
+      </span>
+      <span class="rright">
+        <span class="days">${fmtDays(dc)}<small>${t.kind==='category'?'rolling':'to close'}</small></span>
+      </span>
+    </summary>
+    <div class="detail">
+      ${t.objective ? `<p class="obj">${esc(t.objective)}</p>` : '<p class="obj" style="color:var(--muted)">No description published on the source listing.</p>'}
+      <div class="kv">
+        <div><span class="k">Closes</span><span class="v">${esc(t.close || '—')}</span></div>
+        ${t.open ? `<div><span class="k">Opens</span><span class="v">${esc(t.open)}</span></div>` : ''}
+        ${t.phases && t.phases.length ? `<div><span class="k">Phases</span><span class="v">${esc(t.phases.join(', '))}</span></div>` : ''}
+        ${t.tpoc_until ? `<div><span class="k">Author until</span><span class="v">${esc(t.tpoc_until)}</span></div>` : ''}
+        ${t.status ? `<div><span class="k">Status</span><span class="v">${esc(t.status)}</span></div>` : ''}
+      </div>
+      ${t.tpocs && t.tpocs.length ? `<div class="hits">${t.tpocs.map(e=>`<a class="pill go" href="mailto:${esc(e)}">${esc(e)}</a>`).join('')}</div>` : ''}
+      ${t.fit_hits && t.fit_hits.length ? `<div class="hits"><span class="eyebrow" style="align-self:center">Matched</span>${t.fit_hits.map(h=>`<span class="pill">${esc(h)}</span>`).join('')}</div>` : ''}
+      <a class="out" href="${esc(t.url)}" target="_blank" rel="noopener">Open on ${t.source==='dsip'?'DSIP':'SBIR.gov'} →</a>
+    </div>
+  </details>`;
+}
+
+function render(){
+  const q = $('#q').value.trim().toLowerCase();
+  const ag = $('#agency').value;
+  const minfit = +$('#minfit').value;
+  const hide = $('#hideblocked').checked;
+  const sort = $('#sort').value;
+
+  let list = TOPICS.filter(t => {
+    if (t.fit < minfit) return false;
+    if (hide && t.blocked) return false;
+    if (ag && (t.component || t.agency) !== ag) return false;
+    if (q && !((t.title+' '+(t.code||'')+' '+(t.agency||'')+' '+(t.component||'')+' '+(t.objective||'')).toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  const cmp = {
+    fit:   (a,b) => b.fit - a.fit || (a.close||'9').localeCompare(b.close||'9'),
+    close: (a,b) => (a.close||'9999').localeCompare(b.close||'9999') || b.fit - a.fit,
+    tpoc:  (a,b) => ((tpocOpen(a) ?? 9999) - (tpocOpen(b) ?? 9999)) || b.fit - a.fit,
+  }[sort];
+  list.sort(cmp);
+
+  const sol = list.filter(t => t.kind === 'solicitation');
+  const cat = list.filter(t => t.kind === 'category');
+
+  $('#lane-sol').innerHTML = sol.length ? sol.map(rowHtml).join('')
+    : '<div class="empty">No solicitations match. Lower the minimum fit, or clear the search.</div>';
+  $('#lane-cat').innerHTML = cat.length ? cat.map(rowHtml).join('')
+    : '<div class="empty">No NSF categories match.</div>';
+  $('#count').textContent = `${sol.length} solicitations · ${cat.length} categories`;
+}
+
+['#q','#agency','#minfit','#sort','#hideblocked'].forEach(s =>
+  $(s).addEventListener('input', render));
+
+$('#reg-no').addEventListener('click', () => setReg(28));
+$('#reg-yes').addEventListener('click', () => setReg(0));
+function setReg(d){
+  REG_DAYS = d;
+  $('#reg-no').setAttribute('aria-pressed', d !== 0);
+  $('#reg-yes').setAttribute('aria-pressed', d === 0);
+  renderHeader(); render();
+}
+
+load();
+</script>
+</body>
+</html>

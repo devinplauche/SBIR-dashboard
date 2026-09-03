@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>SBIR Entry Window</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+:root{
+  --paper:#F4F6F4;
+  --surface:#FFFFFF;
+  --sunken:#EAEEEB;
+  --ink:#131A22;
+  --body:#2E3A3C;
+  --muted:#66726F;
+  --rule:#CBD3CE;
+  --rule-strong:#9FAAA5;
+  --accent:#1F5E4A;
+  --accent-soft:#DCE8E1;
+  --signal:#B4552B;
+  --signal-soft:#F5E4DA;
+  --shadow:0 1px 2px rgba(19,26,34,.06),0 8px 24px -16px rgba(19,26,34,.28);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#10161A;
+    --surface:#171F24;
+    --sunken:#1D262B;
+    --ink:#EEF2EF;
+    --body:#C3CDC9;
+    --muted:#8B9793;
+    --rule:#2C383D;
+    --rule-strong:#465559;
+    --accent:#6FBF9D;
+    --accent-soft:#1B3830;
+    --signal:#E08A5C;
+    --signal-soft:#3A2418;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10161A;
+  --surface:#171F24;
+  --sunken:#1D262B;
+  --ink:#EEF2EF;
+  --body:#C3CDC9;
+  --muted:#8B9793;
+  --rule:#2C383D;
+  --rule-strong:#465559;
+  --accent:#6FBF9D;
+  --accent-soft:#1B3830;
+  --signal:#E08A5C;
+  --signal-soft:#3A2418;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--body);
+  font-family:"Source Serif 4",Georgia,serif;
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 96px}
+.col{max-width:660px}
+
+h1,h2,h3,h4{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;color:var(--ink);text-wrap:balance;margin:0}
+h1{font-size:clamp(2.1rem,4.6vw,3.1rem);font-weight:700;line-height:1.04;letter-spacing:-.022em}
+h2{font-size:clamp(1.35rem,2.4vw,1.72rem);font-weight:650;line-height:1.16;letter-spacing:-.012em}
+h3{font-size:1.06rem;font-weight:650;line-height:1.3;letter-spacing:-.005em}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+strong{color:var(--ink);font-weight:600}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:.7rem;font-weight:500;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
+}
+
+/* ---- masthead ---- */
+header.masthead{padding:64px 0 0}
+.rule-top{height:3px;background:var(--ink);margin-bottom:22px}
+.dateline{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:28px}
+.sub{margin-top:20px;font-size:1.14rem;color:var(--body);max-width:640px}
+
+/* ---- status strip ---- */
+.status{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  margin:40px 0 8px;
+}
+.status>div{background:var(--surface);padding:18px 20px;display:flex;flex-direction:column;gap:5px}
+.status .k{font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.status .v{font-family:Archivo,sans-serif;font-size:1.5rem;font-weight:700;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.status .n{font-size:.83rem;line-height:1.4;color:var(--muted)}
+.status .v.hot{color:var(--signal)}
+
+section{margin-top:64px}
+.sec-head{border-top:1px solid var(--rule-strong);padding-top:14px;margin-bottom:26px}
+.sec-head .eyebrow{display:block;margin-bottom:9px}
+.stack{display:flex;flex-direction:column;gap:18px}
+
+/* ---- callout ---- */
+.callout{
+  background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  padding:22px 24px;display:flex;flex-direction:column;gap:12px;
+}
+.callout.warn{border-left-color:var(--signal)}
+.callout h3{font-size:.98rem}
+
+/* ---- timeline ---- */
+.figure{margin:34px 0 10px}
+.figure-scroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);padding:22px 20px}
+.figure svg{display:block;min-width:660px;width:100%;height:auto}
+.caption{font-size:.85rem;color:var(--muted);margin-top:11px;max-width:660px}
+.tl-label{font-family:"IBM Plex Mono",monospace;font-size:11.5px;fill:var(--muted);letter-spacing:.02em}
+.tl-label-b{font-family:Archivo,sans-serif;font-size:12.5px;font-weight:600;fill:var(--ink)}
+.tl-hot{fill:var(--signal)}
+.tl-axis{stroke:var(--rule);stroke-width:1}
+.tl-tick{stroke:var(--rule-strong);stroke-width:1}
+
+/* ---- table ---- */
+.table-scroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.9rem}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{
+  font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;background:var(--sunken);
+}
+tbody tr:last-child td{border-bottom:none}
+td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:500}
+.agency{font-family:Archivo,sans-serif;font-weight:600;color:var(--ink)}
+
+/* ---- ranked topic cards ---- */
+.topics{display:flex;flex-direction:column;gap:20px}
+.topic{background:var(--surface);border:1px solid var(--rule);box-shadow:var(--shadow)}
+.topic-hd{display:flex;gap:18px;align-items:flex-start;padding:20px 24px 16px;border-bottom:1px solid var(--rule)}
+.rank{
+  font-family:Archivo,sans-serif;font-size:2rem;font-weight:700;line-height:.85;
+  color:var(--accent);flex-shrink:0;font-variant-numeric:tabular-nums;padding-top:2px;
+}
+.topic-hd h3{margin-bottom:7px}
+.code{font-family:"IBM Plex Mono",monospace;font-size:.76rem;color:var(--muted);letter-spacing:.02em}
+.topic-body{padding:18px 24px 22px;display:flex;flex-direction:column;gap:14px;font-size:.95rem}
+.attrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.attrs>div{background:var(--sunken);padding:10px 13px;display:flex;flex-direction:column;gap:3px}
+.attrs .k{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.attrs .v{font-family:Archivo,sans-serif;font-size:.83rem;font-weight:600;color:var(--ink);line-height:1.25}
+.why{display:flex;flex-direction:column;gap:7px}
+.why .lbl{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.why .lbl.risk{color:var(--signal)}
+
+.tag{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.64rem;font-weight:500;
+  letter-spacing:.09em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--rule-strong);
+  color:var(--muted);white-space:nowrap;
+}
+.tag.go{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.tag.hot{background:var(--signal-soft);border-color:transparent;color:var(--signal)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+
+/* ---- split compare ---- */
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.split>div{background:var(--surface);padding:22px 24px;display:flex;flex-direction:column;gap:11px}
+.split h3{display:flex;align-items:center;gap:10px}
+
+ul.clean{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+ul.clean li{padding-left:20px;position:relative}
+ul.clean li::before{
+  content:"";position:absolute;left:2px;top:.62em;width:7px;height:1.5px;background:var(--rule-strong);
+}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:14px}
+ol.steps li{counter-increment:s;padding-left:38px;position:relative}
+ol.steps li::before{
+  content:counter(s);position:absolute;left:0;top:1px;
+  font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;color:var(--accent);
+  border:1px solid var(--accent);width:22px;height:22px;display:grid;place-items:center;
+}
+
+footer{margin-top:72px;border-top:1px solid var(--rule-strong);padding-top:20px;font-size:.82rem;color:var(--muted)}
+footer .col{max-width:660px;display:flex;flex-direction:column;gap:10px}
+footer a{color:var(--muted)}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .wrap{padding:0 18px 72px}
+  .topic-hd{gap:13px;padding:18px 18px 14px}
+  .topic-body{padding:16px 18px 20px}
+  .rank{font-size:1.6rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div style="max-width:1120px;margin:0 auto;padding:22px 28px 0">
+<a href="index.html" style="font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#66726F;text-decoration:none">&larr; Back to dashboard</a>
+</div>
+
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="rule-top"></div>
+  <div class="dateline">
+    <span class="eyebrow">Opportunity Analysis</span>
+    <span class="eyebrow">3 September 2026</span>
+    <span class="eyebrow">Source: SBIR.gov · DSIP · NSF</span>
+  </div>
+  <h1>Where a two-person<br>team can actually win</h1>
+  <p class="sub">A read of all 337 open SBIR/STTR topics, filtered to the ones a small software team can execute — and the calendar that decides which are still reachable.</p>
+
+  <div class="status">
+    <div>
+      <span class="k">Program status</span>
+      <span class="v">Live</span>
+      <span class="n">Reauthorized 13 Apr 2026 through FY2031, after a six-month lapse</span>
+    </div>
+    <div>
+      <span class="k">Open topics</span>
+      <span class="v">337</span>
+      <span class="n">251 NSF · 56 DoD open · 48 DoD pre-release · 13 HHS</span>
+    </div>
+    <div>
+      <span class="k">Nearest real action</span>
+      <span class="v hot">19 days</span>
+      <span class="n">Topic-author contact closes 22 Sep — the only window to talk to DoD directly</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="eyebrow">The short version</span>
+    <h2>Two openings are live, and one of them is a trap</h2>
+  </div>
+  <div class="col stack">
+    <p>The 56 DoD topics closing <strong>23 September</strong> look like the obvious target. They are not reachable — a new entity cannot complete SAM.gov registration in 19 days. Treat them as reference material only.</p>
+    <p>The real openings are the <strong>48 DoD topics in pre-release</strong> (proposals accepted 23 Sep – 21 Oct) and <strong>NSF's rolling Project Pitch</strong>. Both are reachable if registration starts this week. Inside the DoD batch there are two topics that read almost like they were scoped for a small team doing LLM evaluation work.</p>
+    <div class="callout warn">
+      <h3>Do this before 22 September</h3>
+      <p>Pre-release is the only period when you may email a DoD topic author directly. Once proposals open on 23 Sep, contact is cut off entirely. A ten-minute call now is worth more than a week of proposal polish later — and almost nobody outside the incumbent base makes it.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="eyebrow">Feasibility</span>
+    <h2>Registration is the gate, not the writing</h2>
+  </div>
+  <div class="col stack">
+    <p>Every deadline below has to be read against one fixed cost: a new company needs roughly three to four weeks to clear SAM.gov, because DLA entity validation sits in the middle of it and cannot be accelerated. The UEI arrives in a day or two; the CAGE code is what you wait on.</p>
+  </div>
+
+  <div class="figure">
+    <div class="figure-scroll">
+      <svg viewBox="0 0 1000 250" role="img" aria-label="Timeline from 3 September to 2 December 2026 showing that SAM.gov registration completes around 1 October, after the 23 September deadline but well before the 21 October and 4 November deadlines.">
+        <line class="tl-axis" x1="70" y1="196" x2="940" y2="196"></line>
+
+        <!-- month ticks: Sep 3 (x70), Oct 1 (x341), Nov 1 (x640), Dec 2 (x940) -->
+        <line class="tl-tick" x1="70" y1="196" x2="70" y2="203"></line>
+        <text class="tl-label" x="70" y="220" text-anchor="middle">3 SEP</text>
+        <line class="tl-tick" x1="341" y1="196" x2="341" y2="203"></line>
+        <text class="tl-label" x="341" y="220" text-anchor="middle">1 OCT</text>
+        <line class="tl-tick" x1="640" y1="196" x2="640" y2="203"></line>
+        <text class="tl-label" x="640" y="220" text-anchor="middle">1 NOV</text>
+        <line class="tl-tick" x1="940" y1="196" x2="940" y2="203"></line>
+        <text class="tl-label" x="940" y="220" text-anchor="middle">2 DEC</text>
+
+        <!-- registration bar -->
+        <text class="tl-label" x="70" y="46">SAM.GOV REGISTRATION · UNAVOIDABLE</text>
+        <rect x="70" y="54" width="271" height="20" fill="var(--rule-strong)" opacity=".45"></rect>
+        <rect x="70" y="54" width="271" height="20" fill="none" stroke="var(--rule-strong)"></rect>
+        <text class="tl-label-b" x="352" y="69">clears ~1 Oct</text>
+
+        <!-- deadline markers -->
+        <!-- 22 Sep TPOC x=254 -->
+        <line x1="254" y1="96" x2="254" y2="196" stroke="var(--signal)" stroke-width="2" stroke-dasharray="4 3"></line>
+        <circle cx="254" cy="96" r="4" fill="var(--signal)"></circle>
+        <text class="tl-label-b tl-hot" x="254" y="88" text-anchor="middle">22 Sep</text>
+        <text class="tl-label" x="254" y="112" text-anchor="middle">talk to DoD</text>
+
+        <!-- 23 Sep close x=263 -->
+        <line x1="263" y1="150" x2="263" y2="196" stroke="var(--rule-strong)" stroke-width="2"></line>
+        <text class="tl-label" x="263" y="143" text-anchor="start">23 Sep · 56 topics close (out of reach)</text>
+
+        <!-- 21 Oct x=534 -->
+        <line x1="534" y1="96" x2="534" y2="196" stroke="var(--accent)" stroke-width="2"></line>
+        <circle cx="534" cy="96" r="4" fill="var(--accent)"></circle>
+        <text class="tl-label-b" x="534" y="88" text-anchor="middle">21 Oct</text>
+        <text class="tl-label" x="534" y="112" text-anchor="middle">DoD Release 6 closes</text>
+
+        <!-- 4 Nov x=669 -->
+        <line x1="669" y1="150" x2="669" y2="196" stroke="var(--accent)" stroke-width="2"></line>
+        <circle cx="669" cy="150" r="4" fill="var(--accent)"></circle>
+        <text class="tl-label-b" x="669" y="142" text-anchor="middle">4 Nov</text>
+        <text class="tl-label" x="669" y="167" text-anchor="middle">NSF full proposal</text>
+
+        <!-- reachable band -->
+        <rect x="341" y="182" width="599" height="8" fill="var(--accent)" opacity=".16"></rect>
+        <text class="tl-label" x="940" y="176" text-anchor="end" fill="var(--accent)">REACHABLE IF YOU START NOW</text>
+      </svg>
+    </div>
+    <p class="caption">The 23 September batch falls inside the registration window, which is what puts it out of reach. Everything from 1 October onward is live territory.</p>
+  </div>
+
+  <div class="col stack" style="margin-top:26px">
+    <p>One knock-on effect worth planning around: NSF requires an invited Project Pitch before you may submit a full proposal, and pitch review takes <strong>one to two months</strong>. A pitch sent today most likely will not clear in time for 4 November. The honest NSF target is the <strong>4 March 2027</strong> deadline, with the pitch going in now.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="eyebrow">Landscape</span>
+    <h2>Where the open topics actually sit</h2>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Agency</th><th>Open topics</th><th>Phase I award</th><th>Next deadline</th><th>Fit for a small software team</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="agency">NSF</td><td class="num">251</td><td class="num">$305K / 6–18 mo</td><td class="num">4 Mar 2027</td>
+          <td>Best structural fit. No government customer required, and the topics are broad categories rather than prescriptive asks.</td>
+        </tr>
+        <tr>
+          <td class="agency">DoD</td><td class="num">56 + 48</td><td class="num">~$250K / 3–12 mo</td><td class="num">21 Oct 2026</td>
+          <td>Narrow, specific asks. Harder to write, but a handful are pure software with no clearance or hardware.</td>
+        </tr>
+        <tr>
+          <td class="agency">HHS</td><td class="num">13</td><td class="num">Varies</td><td class="num">6 Apr 2027</td>
+          <td>Mostly therapeutics and devices. Also the one agency with a restrictive AI-drafting policy — see below.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="caption">NSF's 251 entries are taxonomy categories (&ldquo;Artificial Intelligence&rdquo;, &ldquo;Cybersecurity and Authentication&rdquo;), not individual solicitations — you propose into one, you don't answer it.</p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="eyebrow">Ranked by fit</span>
+    <h2>Three topics worth your October</h2>
+  </div>
+  <div class="col stack" style="margin-bottom:26px">
+    <p>Filtered from 104 DoD topics down to those needing no hardware, no lab, no clinical work, and no facility clearance — then ranked by how closely the Phase&nbsp;I deliverable matches what a small team with strong LLM tooling can actually build in a few months.</p>
+  </div>
+
+  <div class="topics">
+
+    <article class="topic">
+      <div class="topic-hd">
+        <span class="rank">1</span>
+        <div>
+          <h3>Influence Benchmarks for AI Systems</h3>
+          <span class="code">DPA26BZ06-DV026 · DARPA · SBIR</span>
+          <div class="tags"><span class="tag go">Phase I available</span><span class="tag">Software only</span><span class="tag">Black-box access</span></div>
+        </div>
+      </div>
+      <div class="topic-body">
+        <p>Build a simulated marketplace as a testbed for characterizing how LLM agents behave under pressure — whether they adapt, collaborate, or deceive — plus classifiers that detect bias in agent behavior and market outcomes.</p>
+        <div class="attrs">
+          <div><span class="k">Window</span><span class="v">23 Sep – 21 Oct</span></div>
+          <div><span class="k">Phase I</span><span class="v">~9 months</span></div>
+          <div><span class="k">Deliverable</span><span class="v">Working testbed</span></div>
+          <div><span class="k">Hardware</span><span class="v">None</span></div>
+        </div>
+        <div class="why">
+          <span class="lbl">Why it fits</span>
+          <p>The topic explicitly requires the testbed to work from <strong>queries and outputs alone</strong>, with no access to model internals. That is precisely the constraint you already operate under with a commercial model, and it removes the usual barrier of needing privileged infrastructure. Milestones are staged at months 2, 6, and 9 — market mechanics, then agent decision space, then demonstration. This is a software project end to end.</p>
+        </div>
+        <div class="why">
+          <span class="lbl risk">What makes it hard</span>
+          <p>DARPA is the most competitive component here, and the topic cites current literature by name — Magentic Marketplace among others. Reviewers will expect you to know that work cold. No listed topic author, so you cannot pre-brief this one.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="topic">
+      <div class="topic-hd">
+        <span class="rank">2</span>
+        <div>
+          <h3>Agentic-AI, Schema-Driven Decision Management</h3>
+          <span class="code">ARM26BX06-NV012 · Army · SBIR</span>
+          <div class="tags"><span class="tag go">Phase I available</span><span class="tag">Software only</span><span class="tag hot">Author reachable to 22 Sep</span></div>
+        </div>
+      </div>
+      <div class="topic-body">
+        <p>A schema-driven decision-management layer with governed agentic AI on top, turning messy engineering and acquisition questions into auditable, signer-ready decision packages.</p>
+        <div class="attrs">
+          <div><span class="k">Window</span><span class="v">23 Sep – 21 Oct</span></div>
+          <div><span class="k">Topic author</span><span class="v">stephen.h.rapp<br>.civ@army.mil</span></div>
+          <div><span class="k">Deliverable</span><span class="v">2 demos</span></div>
+          <div><span class="k">Hardware</span><span class="v">None</span></div>
+        </div>
+        <div class="why">
+          <span class="lbl">Why it fits</span>
+          <p>The topic states outright that it wants <strong>proof by demonstration, not a full product build</strong> — an unusually honest scoping that plays to a small team's strengths. The core asks are a decision schema treating assumptions, risks, and bias checks as first-class objects, plus an agentic layer producing reproducible runs with explicit &ldquo;what flips the decision&rdquo; logic. And it has a named, reachable topic author right now.</p>
+        </div>
+        <div class="why">
+          <span class="lbl risk">What makes it hard</span>
+          <p>It assumes fluency in digital-engineering tooling — SysML 2.0, digital threads, ground-vehicle domain modeling. If nobody on the team has touched systems engineering, that gap will show. This is the specific thing to ask the author about before 22 September.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="topic">
+      <div class="topic-hd">
+        <span class="rank">3</span>
+        <div>
+          <h3>AI Performance Evaluation Tool</h3>
+          <span class="code">DAF26TZ06-NV006 · Air Force · STTR</span>
+          <div class="tags"><span class="tag">Phase I available</span><span class="tag hot">University partner required</span></div>
+        </div>
+      </div>
+      <div class="topic-body">
+        <p>A tool that standardizes evaluation of AI-enabled systems — quantifying performance, reliability, and robustness of models across operational conditions for Air Force test and evaluation.</p>
+        <div class="attrs">
+          <div><span class="k">Window</span><span class="v">23 Sep – 21 Oct</span></div>
+          <div><span class="k">Program</span><span class="v">STTR</span></div>
+          <div><span class="k">Split</span><span class="v">40% you / 30% RI</span></div>
+          <div><span class="k">Author</span><span class="v">Reachable</span></div>
+        </div>
+        <div class="why">
+          <span class="lbl">Why it fits</span>
+          <p>Model evaluation methodology is squarely in reach for a small team, and the STTR structure means a university partner carries part of the research burden and lends credibility a first-time applicant otherwise lacks.</p>
+        </div>
+        <div class="why">
+          <span class="lbl risk">What makes it hard</span>
+          <p>STTR mandates a formal research-institution partner with a negotiated agreement in place. Standing that up from scratch in six weeks is unrealistic — pursue this only if you already have a faculty relationship. It also expects evaluation of EO/IR, radar, and RF sensor suites, which is real domain depth.</p>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="eyebrow">Critical caveat</span>
+    <h2>The agencies disagree sharply on AI-assisted proposals</h2>
+  </div>
+  <div class="col stack" style="margin-bottom:24px">
+    <p>This bears directly on how you plan to work. The two relevant agencies have taken opposite positions, and the gap is wide enough to change which one you target.</p>
+  </div>
+  <div class="split">
+    <div>
+      <h3>NSF <span class="tag go">Permitted</span></h3>
+      <p>Generative AI may be used in proposal preparation. Disclosure is <strong>encouraged but not required</strong>; where offered, it should name the tool, describe the use, and confirm a qualified human verified the output.</p>
+      <p>The hard line is elsewhere: NSF's research-misconduct definition was rewritten to cover fabrication and falsification <em>committed through AI tools</em>. Unverified citations or invented preliminary data are misconduct, not a style problem.</p>
+    </div>
+    <div>
+      <h3>NIH <span class="tag hot">Restricted</span></h3>
+      <p>Under NOT-OD-25-132, applications or sections <strong>substantially developed by AI</strong> will not be considered the applicant's original ideas — and will not be considered at all.</p>
+      <p>NIH deliberately declined to define &ldquo;substantially&rdquo;: no percentage, no word count, no rubric. Detection after award can trigger referral to the Office of Research Integrity, cost disallowance, or termination. There is also a six-application annual cap per PI.</p>
+    </div>
+  </div>
+  <div class="col stack" style="margin-top:24px">
+    <div class="callout">
+      <h3>The practical reading</h3>
+      <p>Use Claude the way you would use a strong analyst: literature and topic research, structuring arguments, pressure-testing technical approach, drafting code, checking your work against the solicitation. Do not use it to originate the technical idea or generate the narrative wholesale — that is the thing NIH prohibits and NSF reviewers are trained to notice. Verify every citation yourself. Given the ambiguity, HHS is the wrong first target for a team leaning heavily on AI assistance; NSF and DoD are not.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="eyebrow">Before you commit</span>
+    <h2>Eligibility, in one pass</h2>
+  </div>
+  <div class="col">
+    <ul class="clean">
+      <li><strong>Ownership</strong> — at least 51% held by US citizens or permanent residents.</li>
+      <li><strong>Size</strong> — 500 employees or fewer, counted as headcount including part-time and temporary staff.</li>
+      <li><strong>Principal investigator</strong> — must be more than 50% employed by the company for the project's duration. Not required at submission, but required at award, so a PI holding a full-time job elsewhere has to be ready to leave it.</li>
+      <li><strong>Work location</strong> — performed in the United States. The PI may be a foreign national provided both conditions hold.</li>
+      <li><strong>STTR only</strong> — a research-institution partner performing at least 30% of the work, with your company at 40% or more.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="eyebrow">Sequence</span>
+    <h2>What to do, in order</h2>
+  </div>
+  <div class="col">
+    <ol class="steps">
+      <li><strong>Today.</strong> Start SAM.gov registration. Nothing else matters until the clock on DLA validation is running — it gates every deadline on the page.</li>
+      <li><strong>This week, before 22 Sep.</strong> Email the Army topic author on <span class="mono">ARM26BX06-NV012</span> and request a call. Ask what the ground-vehicle domain grounding actually requires and what a credible demonstration looks like. You may ask about the requirement; you may not ask them to evaluate your approach.</li>
+      <li><strong>In parallel.</strong> Submit an NSF Project Pitch — four sections, about 10,500 characters total. Two per company per twelve months, so spend them deliberately. Expect one to two months for a response.</li>
+      <li><strong>23 Sep – 21 Oct.</strong> Write one DoD proposal. Not three. A single well-grounded submission beats a spread every time, and the ranking above is the order to pick from.</li>
+      <li><strong>Ongoing.</strong> Watch the first Wednesday of each month — DoD pre-releases a new batch then, opening the next contact window. If October slips, November is four weeks behind it.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="eyebrow">Honest assessment</span>
+    <h2>What would sink this</h2>
+  </div>
+  <div class="col stack">
+    <p><strong>The NSF trap is technical risk.</strong> NSF does not fund straightforward engineering or incremental product build-out. If the hard part of your project is market adoption, integration, or scale-up rather than a genuine scientific or engineering unknown, the pitch gets declined for program fit. &ldquo;We built a capable application on top of a commercial model&rdquo; is exactly the shape that fails. The unknown has to be real, and you have to be able to name it in one sentence.</p>
+    <p><strong>The DoD trap is domain credibility.</strong> These topics are written by people with a specific operational problem, and reviewers include the person who wrote it. Fluent prose about agentic architectures will not survive contact with a reviewer who wants to know how it handles their actual data. This is the entire reason the pre-release call matters.</p>
+    <p><strong>The structural risk is the PI requirement.</strong> More than 50% employment at the company is a real commitment, not a formality. Decide who that person is before writing anything — if the answer is unclear, the proposal has a hole in it that reviewers reliably find.</p>
+    <p>None of these are reasons not to proceed. A first Phase I is a genuinely winnable target for a small technical team, and the current moment — agencies restarting after a six-month lapse, a heavy concentration of AI evaluation and agentic-tooling topics — is a better-than-usual entry point.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="col">
+    <p>Compiled 3 September 2026 from all 337 open topics on SBIR.gov, 104 DoD topics from the Defense SBIR/STTR Innovation Portal including pre-release, and current NSF and NIH policy notices. Topic windows and award ceilings vary by component — confirm against the agency's own solicitation before relying on any figure here, since SBIR.gov mirrors agency documents and is not authoritative.</p>
+    <p class="mono" style="font-size:.74rem">SBIR.gov API endpoints were under maintenance at time of writing; figures were drawn from the live site and DSIP directly.</p>
+  </div>
+</footer>
+
+</div>
+
+</body>
+</html>

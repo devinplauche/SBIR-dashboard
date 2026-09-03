@@ -1,0 +1,89 @@
+name: Refresh SBIR data
+
+on:
+  schedule:
+    # 11:00 UTC daily (~06:00 ET). Deadlines shift every day, and DoD
+    # pre-releases a new topic batch the first Wednesday of each month.
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - "docs/index.html"
+      - ".github/workflows/refresh.yml"
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    outputs:
+      degraded: ${{ steps.scrape.outputs.degraded }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # No dependencies by design - fetch.py is standard library only, so
+      # there is no install step to break and nothing to keep patched.
+      - name: Scrape sources
+        id: scrape
+        run: |
+          python scripts/fetch.py
+          echo "degraded=$(python -c "import json;print(json.load(open('docs/data/meta.json'))['degraded'])")" >> "$GITHUB_OUTPUT"
+          python -c "
+          import json
+          m = json.load(open('docs/data/meta.json'))
+          print(f\"total={m['total']} agencies={m['agencies']}\")
+          for k, v in m['sources'].items():
+              print(f\"  {k}: ok={v['ok']} count={v['count']} {v.get('error') or ''}\")
+          "
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data
+          if git diff --staged --quiet; then
+            echo "No change in topic data."
+          else
+            git commit -m "data: refresh open topics ($(date -u +%Y-%m-%d))"
+            git push
+          fi
+
+      - name: Warn if a source failed
+        if: steps.scrape.outputs.degraded == 'True'
+        run: |
+          echo "::warning::At least one source failed; stale topics were carried forward. See docs/data/meta.json."
+
+      - uses: actions/configure-pages@v5
+        continue-on-error: true
+        id: pages
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.pages.outcome == 'success'
+        with:
+          path: docs
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    # Pages must be enabled in repo settings (Settings -> Pages -> GitHub Actions).
+    # On a private repo this also requires a paid plan; the data commit above
+    # still runs either way, so the dataset stays fresh regardless.
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deploy
+        continue-on-error: true
