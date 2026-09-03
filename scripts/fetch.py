@@ -214,7 +214,7 @@ def parse_page(h, into):
     return rows
 
 
-def fetch_sbirgov(max_passes=6):
+def fetch_sbirgov(max_passes=8, patience=3):
     """Sweep the paged listing until the unique count reaches the site's own total.
 
     The listing's sort has no tiebreaker, and the NSF block shares a close date
@@ -229,6 +229,7 @@ def fetch_sbirgov(max_passes=6):
     """
     found = {}
     target = None
+    dry = 0
 
     for attempt in range(max_passes):
         before = len(found)
@@ -246,10 +247,14 @@ def fetch_sbirgov(max_passes=6):
             time.sleep(0.25)
 
         gained = len(found) - before
+        dry = dry + 1 if gained == 0 else 0
         print(f"  sbir.gov pass {attempt + 1}: {len(found)} unique (+{gained})", flush=True)
         if target and len(found) >= target:
             break
-        if gained == 0 and attempt > 0:
+        # A single zero-gain pass means an unlucky shuffle, not convergence -
+        # the last few stragglers can take several passes to surface. Only give
+        # up after `patience` consecutive passes that add nothing.
+        if dry >= patience:
             break
 
     if target and len(found) < target:
