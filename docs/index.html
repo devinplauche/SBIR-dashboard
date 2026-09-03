@@ -326,9 +326,12 @@ function renderHeader(){
   const bad = srcs.filter(([,v]) => !v.ok);
   const h = $('#health');
   h.className = 'health' + (bad.length ? ' bad' : '');
-  h.innerHTML = srcs.map(([k,v]) =>
-    `<span class="mono"><span class="dot ${v.ok?'ok':'bad'}"></span>${esc(k)} · ${v.count} topics${v.ok?'':' · STALE, carried forward'}</span>`
-  ).join('') + (bad.length
+  h.innerHTML = srcs.map(([k,v]) => {
+    const incomplete = v.ok && v.complete === false;
+    return `<span class="mono"><span class="dot ${v.ok && !incomplete ?'ok':'bad'}"></span>${esc(k)} · ${v.count} topics` +
+      (v.ok ? (incomplete ? ` · INCOMPLETE, expected ${v.expected}` : '') : ' · STALE, carried forward') +
+      `</span>`;
+  }).join('') + (bad.length
     ? `<span class="mono" style="flex:1;min-width:200px">${esc(bad.map(([k,v])=>k+': '+v.error).join(' | '))}</span>`
     : '');
 

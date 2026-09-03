@@ -177,22 +177,22 @@ def date_field(label, s):
         return None
 
 
-def fetch_sbirgov():
-    topics, seen, page = [], set(), 0
-    while page < 60:
-        h = get(SBIRGOV.format(page))
-        found = 0
-        for m in BLOCK_RE.finditer(h):
-            tid, title, body = m.group(1), clean(m.group(2)), m.group(3)
-            found += 1
-            if tid in seen:
-                continue
-            seen.add(tid)
-            seal = SEAL_RE.search(body)
-            desc = DESC_RE.search(body)
-            tags = TAG_RE.findall(body)
-            programs = [t for t in tags if t in ("SBIR", "STTR", "BOTH")]
-            topics.append({
+TOTAL_RE = re.compile(r"of ([\d,]+) results")
+
+
+def parse_page(h, into):
+    """Parse one results page into `into`, keyed by topic id. Returns rows seen."""
+    rows = 0
+    for m in BLOCK_RE.finditer(h):
+        tid, title, body = m.group(1), clean(m.group(2)), m.group(3)
+        rows += 1
+        if tid in into:
+            continue
+        seal = SEAL_RE.search(body)
+        desc = DESC_RE.search(body)
+        tags = TAG_RE.findall(body)
+        programs = [t for t in tags if t in ("SBIR", "STTR", "BOTH")]
+        into[tid] = {
                 "source": "sbirgov",
                 "id": tid,
                 "code": None,
@@ -207,16 +207,59 @@ def fetch_sbirgov():
                 "close": date_field("Close Date", body),
                 "tpoc_until": None,
                 "tpocs": [],
-                "url": f"https://www.sbir.gov/topics/{tid}",
-                "objective": clean(desc.group(1))[:700] if desc else "",
-                "text": clean(desc.group(1))[:6000] if desc else "",
-            })
-        print(f"  sbir.gov page {page} -> {found} blocks, {len(topics)} kept", flush=True)
-        if found == 0:
+            "url": f"https://www.sbir.gov/topics/{tid}",
+            "objective": clean(desc.group(1))[:700] if desc else "",
+            "text": clean(desc.group(1))[:6000] if desc else "",
+        }
+    return rows
+
+
+def fetch_sbirgov(max_passes=6):
+    """Sweep the paged listing until the unique count reaches the site's own total.
+
+    The listing's sort has no tiebreaker, and the NSF block shares a close date
+    across hundreds of entries, so rows shuffle between pages from one request
+    to the next. A single sweep therefore returns duplicates on some pages and
+    silently omits whatever they displaced - measured at 323 of 337 topics, with
+    the missing 14 differing per run.
+
+    Re-sweeping converges: each pass sees a fresh shuffle, so previously missed
+    rows surface. Stop as soon as the site's reported total is reached, or when
+    a pass adds nothing.
+    """
+    found = {}
+    target = None
+
+    for attempt in range(max_passes):
+        before = len(found)
+        page = 0
+        while page < 80:
+            h = get(SBIRGOV.format(page))
+            if target is None:
+                m = TOTAL_RE.search(h)
+                if m:
+                    target = int(m.group(1).replace(",", ""))
+                    print(f"  sbir.gov reports {target} open topics", flush=True)
+            if parse_page(h, found) == 0:
+                break
+            page += 1
+            time.sleep(0.25)
+
+        gained = len(found) - before
+        print(f"  sbir.gov pass {attempt + 1}: {len(found)} unique (+{gained})", flush=True)
+        if target and len(found) >= target:
             break
-        page += 1
-        time.sleep(0.3)
-    return topics
+        if gained == 0 and attempt > 0:
+            break
+
+    if target and len(found) < target:
+        print(f"  sbir.gov WARNING: got {len(found)} of {target} after {max_passes} passes",
+              file=sys.stderr, flush=True)
+
+    out = list(found.values())
+    for t in out:
+        t["_target"] = target
+    return out
 
 
 # --------------------------------------------------------------------------
@@ -365,9 +408,17 @@ def main():
             got = fn()
             if not got:
                 raise RuntimeError("source returned zero topics")
+            expected = next((t.pop("_target", None) for t in got), None)
+            for t in got:
+                t.pop("_target", None)
+            sources[name] = {
+                "ok": True, "count": len(got), "error": None,
+                "expected": expected,
+                "complete": (expected is None or len(got) >= expected),
+            }
             topics += got
-            sources[name] = {"ok": True, "count": len(got), "error": None}
-            print(f"[{name}] ok, {len(got)} topics", flush=True)
+            short = "" if sources[name]["complete"] else f" (SHORT of {expected})"
+            print(f"[{name}] ok, {len(got)} topics{short}", flush=True)
         except Exception as e:  # noqa: BLE001
             carried = [t for t in previous if t.get("source") == name]
             topics += carried
