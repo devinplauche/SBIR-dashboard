@@ -44,9 +44,11 @@ jobs:
           python -c "
           import json
           m = json.load(open('docs/data/meta.json'))
-          print(f\"total={m['total']} agencies={m['agencies']}\")
+          print(f\"total={m['total']} agencies={m['agencies']} kinds={m['kinds']}\")
           for k, v in m['sources'].items():
-              print(f\"  {k}: ok={v['ok']} count={v['count']} {v.get('error') or ''}\")
+              if k.startswith('_'):
+                  continue
+              print(f\"  {k}: ok={v['ok']} count={v.get('count', 0)} {v.get('error') or ''}\")
           "
 
       - name: Commit refreshed data
